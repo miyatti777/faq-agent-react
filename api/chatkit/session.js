@@ -32,7 +32,9 @@ export default async function handler(req, res) {
         'OpenAI-Beta': 'chatkit_beta=v1',
       },
       body: JSON.stringify({
-        workflow_id: 'wf_68e4692701c88190b320ee7546ec44d70e84b98b70d37035',
+        workflow: {
+          id: 'wf_68e4692701c88190b320ee7546ec44d70e84b98b70d37035'
+        },
         user: req.body?.deviceId || 'anonymous-' + Date.now(),
       }),
     });
