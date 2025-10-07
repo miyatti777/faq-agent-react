@@ -6,25 +6,16 @@ function App() {
     api: {
       async getClientSecret(existing) {
         if (existing) {
-          // セッション更新の実装（オプション）
-          return existing;
+          // Implement session refresh if needed
+          console.log('Refreshing existing session...');
         }
 
-        // サーバーから新しいclient_secretを取得
         const res = await fetch('/api/chatkit/session', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ 
-            deviceId: 'web-user-' + Date.now() 
-          }),
         });
-
-        if (!res.ok) {
-          throw new Error('Failed to get client secret');
-        }
-
         const { client_secret } = await res.json();
         return client_secret;
       },
@@ -41,7 +32,7 @@ function App() {
       <main className="chat-container">
         <ChatKit 
           control={control} 
-          className="chatkit-widget"
+          className="h-[600px] w-[320px]"
         />
       </main>
 
