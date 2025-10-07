@@ -1,5 +1,3 @@
-import OpenAI from 'openai';
-
 export default async function handler(req, res) {
   // CORSヘッダーを設定
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,18 +23,29 @@ export default async function handler(req, res) {
       });
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-
-    // ChatKitセッションを作成
-    const session = await openai.chatkit.sessions.create({
-      workflow: { 
-        id: 'wf_68e4692701c88190b320ee7546ec44d70e84b98b70d37035' 
+    // ChatKit REST API を使用してセッションを作成
+    const response = await fetch('https://api.openai.com/v1/chatkit/sessions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
       },
-      user: req.body?.deviceId || 'anonymous-' + Date.now(),
+      body: JSON.stringify({
+        workflow_id: 'wf_68e4692701c88190b320ee7546ec44d70e84b98b70d37035',
+        user: req.body?.deviceId || 'anonymous-' + Date.now(),
+      }),
     });
 
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ ChatKit API error:', response.status, errorText);
+      return res.status(response.status).json({ 
+        error: 'Failed to create session',
+        details: errorText 
+      });
+    }
+
+    const session = await response.json();
     console.log('✅ ChatKit session created successfully');
 
     return res.status(200).json({ 
